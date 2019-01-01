@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
     //tab titles names
     String[] tabsTitles = {"TOODS"};
+    MonkeyListFragment monkeysFragment;
 
     AppDatabase db;
 
@@ -38,12 +39,13 @@ public class MainActivity extends AppCompatActivity {
         viewPager = findViewById(R.id.main_vp);
 
         AppDatabase.setContext(MainActivity.this);
+        monkeysFragment = new MonkeyListFragment();
 
         FragmentStatePagerAdapter tabAdapter = new FragmentStatePagerAdapter(getSupportFragmentManager()) {
             @Override
             public Fragment getItem(int position) {
                 if(position == 0)
-                    return new MonkeyListFragment();//chatListFragment;
+                    return monkeysFragment;//chatListFragment;
                 return null;
             }
 
@@ -101,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+            monkeysFragment.updateList();
         }
     }
 

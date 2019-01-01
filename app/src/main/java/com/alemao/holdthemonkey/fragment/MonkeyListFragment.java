@@ -44,7 +44,7 @@ public class MonkeyListFragment extends Fragment {
         adapter = new MonkeyListItemAdapter(getActivity(), monkeys);
         listView.setAdapter(adapter);
 
-        new GetAllTask().execute();
+        updateList();
 
         /*listView.setOnClickListener(new AdapterView.OnItemClickListener(){
             @Override
@@ -78,5 +78,9 @@ public class MonkeyListFragment extends Fragment {
 
             adapter.notifyDataSetChanged();
         }
+    }
+
+    public void updateList(){
+        new GetAllTask().execute();
     }
 }

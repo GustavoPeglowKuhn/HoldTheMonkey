@@ -18,6 +18,7 @@ import com.alemao.holdthemonkey.database.MonkeyAverage;
 import com.alemao.holdthemonkey.model.MonkeyListItem;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class MonkeyListFragment extends Fragment {
@@ -51,15 +52,34 @@ public class MonkeyListFragment extends Fragment {
             }
         });*/
 
+        updateList(0,0);
+
         return view;
     }
 
-    class GetAllTask extends AsyncTask<Void, Void, List<MonkeyAverage>> {
+    class GetAllTask extends AsyncTask<Integer, Void, List<MonkeyAverage>> {
+
+        /*
+        * ints:
+        * [0] = tipo de busca
+        * [1] = ano
+        * [2] = mes
+        * */
 
         @Override
-        protected List<MonkeyAverage> doInBackground(Void... voids) {
+        protected List<MonkeyAverage> doInBackground(Integer... ints) {
             try {
-                return db.getDb().monkeyAverageDAO().getSum();
+                if(ints != null){
+                    if(ints[0] == 0){
+                        return db.getDb().monkeyAverageDAO().getAll();
+                    }else if(ints[0] == 1){
+                        return db.getDb().monkeyAverageDAO().getSum();
+                    }else if(ints[0] == 2){
+                        return db.getDb().monkeyAverageDAO().getAll(ints[1], ints[2]);
+                    }else if(ints[0] == 3){
+                        return db.getDb().monkeyAverageDAO().getSum(ints[1], ints[2]);
+                    }
+                }
             }catch (Exception e){
                 Log.d("db", e.getMessage());
             }
@@ -79,6 +99,6 @@ public class MonkeyListFragment extends Fragment {
     }
 
     public void updateList(int sortType, int mes){
-        new GetAllTask().execute();
+        new GetAllTask().execute(sortType, Calendar.getInstance().get(Calendar.YEAR), mes);
     }
 }

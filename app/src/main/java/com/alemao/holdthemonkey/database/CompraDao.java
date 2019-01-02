@@ -22,7 +22,6 @@ public interface CompraDao {    //Data Access Object = DAO
     @Query("SELECT AVG(custo) FROM compra WHERE categoria LIKE :category")
     float getAvg(String category);
 
-    //TODO: limitar a query por data
     @Query("SELECT SUM(custo) FROM compra WHERE categoria LIKE :category AND ano = :ano AND mes = :mes")
     float getSum(String category, int ano, int mes);
     @Query("SELECT AVG(custo) FROM compra WHERE categoria LIKE :category AND ano = :ano AND mes = :mes")

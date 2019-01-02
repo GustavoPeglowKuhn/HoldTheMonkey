@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     * 3 - todos do mes n separados por categoria
     * */
     static int sortType = 1;
-    static int mes = 1;    //de 1 a 12
+    static int mes = 1;    //de 0 a 11
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this, "Mes invalido", Toast.LENGTH_SHORT).show();
                     }
 
-                    mes = month;
+                    mes = month-1;
                 }
                 sortType = auxSortType;
                 monkeysFragment.updateList(sortType, mes);

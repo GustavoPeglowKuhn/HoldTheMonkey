@@ -4,6 +4,8 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
+import java.util.Calendar;
+
 @Entity(tableName = "compra")
 public class Compra {
     @PrimaryKey(autoGenerate = true)
@@ -30,8 +32,10 @@ public class Compra {
         this.categoria = categoria;
         this.custo = custo;
         this.detalhes = detalhes;
-        this.dia = 1;
-        this.mes = 1;
-        this.ano = 2020;
+
+        Calendar calendar = Calendar.getInstance();
+        dia = calendar.get(Calendar.DAY_OF_MONTH);
+        mes = calendar.get(Calendar.MONTH);
+        ano = calendar.get(Calendar.YEAR);
     }
 }

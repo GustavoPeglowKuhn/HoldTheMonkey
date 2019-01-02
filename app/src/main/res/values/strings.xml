@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Hold The Monkey</string>
+    <string name="action_settings">Settings</string>
 </resources>

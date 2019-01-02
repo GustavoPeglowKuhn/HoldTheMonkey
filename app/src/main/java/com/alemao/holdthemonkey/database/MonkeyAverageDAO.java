@@ -14,8 +14,8 @@ public interface MonkeyAverageDAO {
     List<MonkeyAverage> getSum();
 
     @Query("SELECT categoria, custo FROM compra WHERE ano = :ano AND mes = :mes")
-    List<MonkeyAverage> getAll(int ano, int mes);
+    List<MonkeyAverage> getAll(int mes, int ano);
 
     @Query("SELECT categoria, SUM(custo) AS custo FROM compra WHERE ano = :ano AND mes = :mes GROUP BY categoria")
-    List<MonkeyAverage> getSum(int ano, int mes);
+    List<MonkeyAverage> getSum(int mes, int ano);
 }

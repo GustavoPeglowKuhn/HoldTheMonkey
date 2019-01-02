@@ -7,10 +7,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.alemao.holdthemonkey.R;
+import com.alemao.holdthemonkey.adapter.MonkeyDetailListItemAdapter;
 import com.alemao.holdthemonkey.adapter.MonkeyListItemAdapter;
 import com.alemao.holdthemonkey.database.AppDatabase;
 import com.alemao.holdthemonkey.database.Compra;
@@ -21,15 +21,15 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class MonkeyListFragment extends Fragment {
+public class MonkeyListDetailsFragment extends Fragment {
 
     private ListView listView;
-    private ArrayList<MonkeyListItem> monkeys;
-    private MonkeyListItemAdapter adapter;
+    private ArrayList<Compra> monkeys;
+    private MonkeyDetailListItemAdapter adapter;
 
     private AppDatabase db; //static
 
-    public MonkeyListFragment() {
+    public MonkeyListDetailsFragment() {
         // Required empty public constructor
     }
 
@@ -37,12 +37,12 @@ public class MonkeyListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_monkey_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_monkey_list_details, container, false);
 
-        listView = view.findViewById(R.id.fml_lv_categories);
+        listView = view.findViewById(R.id.fmld_lv_categories);
         monkeys = new ArrayList<>();
 
-        adapter = new MonkeyListItemAdapter(getActivity(), monkeys);
+        adapter = new MonkeyDetailListItemAdapter(getActivity(), monkeys);
         listView.setAdapter(adapter);
 
         /*listView.setOnClickListener(new AdapterView.OnItemClickListener(){
@@ -55,21 +55,21 @@ public class MonkeyListFragment extends Fragment {
         return view;
     }
 
-    class GetAllTask extends AsyncTask<Integer, Void, List<MonkeyAverage>> {
+    class UpdateTask extends AsyncTask<Integer, Void, List<Compra>> {
         //ints
         //[0] = mes  (-1 == sem mes)
         //[1] = ano
 
         @Override
-        protected List<MonkeyAverage> doInBackground(Integer... ints) {
+        protected List<Compra> doInBackground(Integer... ints) {
             try {
                 if(ints != null){
                     if (ints[0] == -1) //sem mes especificado
-                        return db.getDb().monkeyAverageDAO().getSum();
+                        return db.getDb().compraDao().getAll();
                     else
-                        return db.getDb().monkeyAverageDAO().getSum(ints[0], ints[1]);
+                        return db.getDb().compraDao().getAll(ints[0], ints[1]);
                 }
-                return db.getDb().monkeyAverageDAO().getSum();
+                return db.getDb().compraDao().getAll();
             }catch (Exception e){
                 Log.d("db", e.getMessage());
             }
@@ -77,12 +77,12 @@ public class MonkeyListFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(List<MonkeyAverage> list) {
+        protected void onPostExecute(List<Compra> list) {
             monkeys.clear();
 
             if(list!=null) {
-                for (MonkeyAverage item : list) {
-                    monkeys.add(new MonkeyListItem(item.categoria, item.custo));
+                for (Compra item : list) {
+                    monkeys.add(item);
                 }
             }
 
@@ -91,6 +91,6 @@ public class MonkeyListFragment extends Fragment {
     }
 
     public void updateList(int mes, int ano){
-        new GetAllTask().execute(mes, ano);
+        new UpdateTask().execute(mes, ano);
     }
 }

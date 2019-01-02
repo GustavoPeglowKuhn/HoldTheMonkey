@@ -42,7 +42,7 @@ public class MonkeyListItemAdapter extends ArrayAdapter<MonkeyListItem> {
             MonkeyListItem item = list.get(position);
 
             txtCategoria.setText(item.getCategorie());
-            txtCusto.setText(""+item.getCusto());
+            txtCusto.setText("R$"+item.getCusto());
         }
 
         return view;

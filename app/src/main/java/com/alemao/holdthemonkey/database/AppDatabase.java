@@ -7,7 +7,7 @@ import android.content.Context;
 
 @Database(entities = {Compra.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
-    public abstract CompraDao userDao();
+    public abstract CompraDao compraDao();
     public abstract MonkeyAverageDAO monkeyAverageDAO();
     private static AppDatabase db;
     private static Context context;

@@ -14,18 +14,8 @@ public interface CompraDao {    //Data Access Object = DAO
 
     @Query("SELECT * FROM compra")
     List<Compra> getAll();
-    @Query("SELECT * FROM compra WHERE categoria LIKE :category")
-    List<Compra> getAll(String category);
-
-    @Query("SELECT SUM(custo) FROM compra WHERE categoria LIKE :category")
-    float getSum(String category);
-    @Query("SELECT AVG(custo) FROM compra WHERE categoria LIKE :category")
-    float getAvg(String category);
-
-    @Query("SELECT SUM(custo) FROM compra WHERE categoria LIKE :category AND ano = :ano AND mes = :mes")
-    float getSum(String category, int ano, int mes);
-    @Query("SELECT AVG(custo) FROM compra WHERE categoria LIKE :category AND ano = :ano AND mes = :mes")
-    float getAvg(String category, int ano, int mes);
+    @Query("SELECT * FROM compra WHERE ano = :ano AND mes = :mes")
+    List<Compra> getAll(int mes, int ano);
 
     @Insert
     void insertAll(Compra... users);

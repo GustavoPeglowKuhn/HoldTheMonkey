@@ -3,10 +3,12 @@ package com.alemao.holdthemonkey.activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -17,36 +19,37 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.alemao.holdthemonkey.R;
+import com.alemao.holdthemonkey.adapter.MonkeyDetailListItemAdapter;
 import com.alemao.holdthemonkey.database.AppDatabase;
 import com.alemao.holdthemonkey.database.Compra;
+import com.alemao.holdthemonkey.fragment.MonkeyListDetailsFragment;
 import com.alemao.holdthemonkey.fragment.MonkeyListFragment;
+import com.alemao.holdthemonkey.helper.SlidingTabLayout;
 
+import java.util.Calendar;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    ViewPager viewPager;
+    private SlidingTabLayout slidingTabLayout;
+    private ViewPager viewPager;
 
     //tab titles names
-    String[] tabsTitles = {"TOODS"};
+    String[] tabsTitles = {"TOODS", "POR CATEGORIA"};
     MonkeyListFragment monkeysFragment;
+    MonkeyListDetailsFragment monkeyDetailsFragment;
 
     AppDatabase db;
 
-    /*
-    * 0 - todos os itens
-    * 1 - todos separados por categorias
-    * 2 - todos do mes n
-    * 3 - todos do mes n separados por categoria
-    * */
-    static int sortType = 1;
-    static int mes = 1;    //de 0 a 11
+    static int mes;     //de 0 a 11
+    static int ano;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,25 +58,30 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
-        });
+        });*/
 
+        slidingTabLayout = findViewById(R.id.main_stl);
         viewPager = findViewById(R.id.main_vp);
 
         AppDatabase.setContext(MainActivity.this);
         monkeysFragment = new MonkeyListFragment();
+        monkeyDetailsFragment = new MonkeyListDetailsFragment();
+
+        slidingTabLayout.setDistributeEvenly(true);
+        slidingTabLayout.setSelectedIndicatorColors(ContextCompat.getColor(this, R.color.colorAccent));
 
         FragmentStatePagerAdapter tabAdapter = new FragmentStatePagerAdapter(getSupportFragmentManager()) {
             @Override
             public Fragment getItem(int position) {
-                if(position == 0)
-                    return monkeysFragment;//chatListFragment;
+                if(position == 0) return monkeyDetailsFragment;
+                if(position == 1) return monkeysFragment;
                 return null;
             }
 
@@ -84,8 +92,13 @@ public class MainActivity extends AppCompatActivity {
             public CharSequence getPageTitle(int position) { return tabsTitles[position]; }
         };
         viewPager.setAdapter(tabAdapter);
+        slidingTabLayout.setViewPager(viewPager);
 
-        monkeysFragment.updateList(sortType, mes);
+        mes = Calendar.getInstance().get(Calendar.MONTH);
+        ano = Calendar.getInstance().get(Calendar.YEAR);
+
+        monkeysFragment.updateList(mes, ano);
+        monkeyDetailsFragment.updateList(mes, ano);
     }
 
     @Override
@@ -141,7 +154,7 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
-    public void sortSelect(View view){
+    /*public void sortSelect(View view){
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
         LayoutInflater inflater = getLayoutInflater();
 
@@ -189,13 +202,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         alertDialog.show();
-    }
+    }*/
 
     class InsertTask extends AsyncTask<Compra, Void, Void> {
         @Override
         protected Void doInBackground(Compra... compras) {
             try {
-                db.getDb().userDao().insertAll(compras);
+                db.getDb().compraDao().insertAll(compras);
             }catch (Exception e){
                 Log.d("db", e.getMessage());
             }
@@ -205,7 +218,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            monkeysFragment.updateList(sortType, mes);
+            monkeysFragment.updateList(mes, ano);
+            monkeyDetailsFragment.updateList(mes, ano);
         }
     }
 
@@ -216,7 +230,7 @@ public class MainActivity extends AppCompatActivity {
         protected List<String> doInBackground(View... view) {
             try {
                 listItems = view[0];
-                return db.getDb().userDao().getAllCategories();
+                return db.getDb().compraDao().getAllCategories();
             }catch (Exception e){
                 Log.d("db", e.getMessage());
             }

@@ -44,8 +44,6 @@ public class MonkeyListFragment extends Fragment {
         adapter = new MonkeyListItemAdapter(getActivity(), monkeys);
         listView.setAdapter(adapter);
 
-        updateList();
-
         /*listView.setOnClickListener(new AdapterView.OnItemClickListener(){
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -80,7 +78,7 @@ public class MonkeyListFragment extends Fragment {
         }
     }
 
-    public void updateList(){
+    public void updateList(int sortType, int mes){
         new GetAllTask().execute();
     }
 }

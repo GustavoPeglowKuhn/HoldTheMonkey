@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="15dp"
+    android:paddingRight="15dp"
+    android:paddingTop="15dp">
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <RadioButton
+            android:id="@+id/dss_rb0"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Todos"/>
+        <RadioButton
+            android:id="@+id/dss_rb1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Todos por categoria"/>
+        <RadioButton
+            android:id="@+id/dss_rb2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Todos do mes"/>
+        <RadioButton
+            android:id="@+id/dss_rb3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Todos do mes por categoria"/>
+    </RadioGroup>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="10dp"
+        android:paddingRight="20dp"
+        android:paddingEnd="20dp" >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mes: "
+            android:paddingRight="10dp"/>
+
+        <EditText
+            android:id="@+id/dss_edit_month"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="number"
+            android:maxLines="1"/>
+
+    </LinearLayout>
+
+</LinearLayout>

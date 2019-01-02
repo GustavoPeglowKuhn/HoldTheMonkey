@@ -13,6 +13,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.Toast;
 
 import com.alemao.holdthemonkey.R;
 import com.alemao.holdthemonkey.database.AppDatabase;
@@ -30,6 +32,15 @@ public class MainActivity extends AppCompatActivity {
     MonkeyListFragment monkeysFragment;
 
     AppDatabase db;
+
+    /*
+    * 0 - todos os itens
+    * 1 - todos separados por categorias
+    * 2 - todos do mes n
+    * 3 - todos do mes n separados por categoria
+    * */
+    static int sortType = 1;
+    static int mes = 1;    //de 1 a 12
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
             public CharSequence getPageTitle(int position) { return tabsTitles[position]; }
         };
         viewPager.setAdapter(tabAdapter);
+
+        monkeysFragment.updateList(sortType, mes);
     }
 
     public void addMonkey(View view){
@@ -89,6 +102,56 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
+    public void sortSelect(View view){
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+        LayoutInflater inflater = getLayoutInflater();
+
+        final View v = inflater.inflate(R.layout.dialog_sort_select, null);
+
+        alertDialog.setView(v);
+
+        alertDialog.setNegativeButton("cancel", new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int which) { }
+        });
+
+        alertDialog.setPositiveButton("Sort", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                int auxSortType;
+                if(((RadioButton)v.findViewById(R.id.dss_rb0)).isChecked())
+                    auxSortType = 0;
+                else if(((RadioButton)v.findViewById(R.id.dss_rb1)).isChecked())
+                    auxSortType = 1;
+                else if(((RadioButton)v.findViewById(R.id.dss_rb2)).isChecked())
+                    auxSortType = 2;
+                else if(((RadioButton)v.findViewById(R.id.dss_rb3)).isChecked())
+                    auxSortType = 3;
+                else {
+                    Toast.makeText(MainActivity.this, "Selecione um metodo", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                int month;
+                if(auxSortType==2 || auxSortType==3) {
+                    try{
+                        month = Integer.parseInt(((EditText) v.findViewById(R.id.dss_edit_month)).getText().toString());
+                    }catch(Exception e){
+                        month = 100;
+                    }
+                    if(month<1 || month>12) {
+                        Toast.makeText(MainActivity.this, "Mes invalido", Toast.LENGTH_SHORT).show();
+                    }
+
+                    mes = month;
+                }
+                sortType = auxSortType;
+                monkeysFragment.updateList(sortType, mes);
+            }
+        });
+        alertDialog.show();
+    }
+
     class InsertTask extends AsyncTask<Compra, Void, Void> {
         @Override
         protected Void doInBackground(Compra... compras) {
@@ -103,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            monkeysFragment.updateList();
+            monkeysFragment.updateList(sortType, mes);
         }
     }
 

@@ -1,6 +1,7 @@
 package com.alemao.holdthemonkey.activity;
 
 import android.app.Dialog;
+import android.arch.persistence.room.Room;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
@@ -29,15 +30,16 @@ import com.alemao.holdthemonkey.R;
 import com.alemao.holdthemonkey.adapter.MonkeyDetailListItemAdapter;
 import com.alemao.holdthemonkey.database.AppDatabase;
 import com.alemao.holdthemonkey.database.Compra;
+import com.alemao.holdthemonkey.database.MonkeyAverage;
 import com.alemao.holdthemonkey.fragment.MonkeyListDetailsFragment;
 import com.alemao.holdthemonkey.fragment.MonkeyListFragment;
 import com.alemao.holdthemonkey.helper.SlidingTabLayout;
+import com.alemao.holdthemonkey.model.MonkeyListItem;
 
 import java.util.Calendar;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
     private SlidingTabLayout slidingTabLayout;
     private ViewPager viewPager;
 
@@ -46,8 +48,6 @@ public class MainActivity extends AppCompatActivity {
     MonkeyListFragment monkeysFragment;
     MonkeyListDetailsFragment monkeyDetailsFragment;
 
-    AppDatabase db;
-
     static int mes;     //de 0 a 11
     static int ano;
 
@@ -55,22 +55,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
 
         slidingTabLayout = findViewById(R.id.main_stl);
         viewPager = findViewById(R.id.main_vp);
 
-        AppDatabase.setContext(MainActivity.this);
         monkeysFragment = new MonkeyListFragment();
         monkeyDetailsFragment = new MonkeyListDetailsFragment();
 
@@ -97,8 +87,7 @@ public class MainActivity extends AppCompatActivity {
         mes = Calendar.getInstance().get(Calendar.MONTH);
         ano = Calendar.getInstance().get(Calendar.YEAR);
 
-        monkeysFragment.updateList(mes, ano);
-        monkeyDetailsFragment.updateList(mes, ano);
+        new UpdateAllTask().execute();
     }
 
     @Override
@@ -117,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Toast.makeText(MainActivity.this, R.string.version_name, Toast.LENGTH_SHORT).show();
             return true;
         }
 
@@ -154,61 +144,13 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
-    /*public void sortSelect(View view){
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
-        LayoutInflater inflater = getLayoutInflater();
-
-        final View v = inflater.inflate(R.layout.dialog_sort_select, null);
-
-        alertDialog.setView(v);
-
-        alertDialog.setNegativeButton("cancel", new DialogInterface.OnClickListener(){
-            @Override
-            public void onClick(DialogInterface dialog, int which) { }
-        });
-
-        alertDialog.setPositiveButton("Sort", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                int auxSortType;
-                if(((RadioButton)v.findViewById(R.id.dss_rb0)).isChecked())
-                    auxSortType = 0;
-                else if(((RadioButton)v.findViewById(R.id.dss_rb1)).isChecked())
-                    auxSortType = 1;
-                else if(((RadioButton)v.findViewById(R.id.dss_rb2)).isChecked())
-                    auxSortType = 2;
-                else if(((RadioButton)v.findViewById(R.id.dss_rb3)).isChecked())
-                    auxSortType = 3;
-                else {
-                    Toast.makeText(MainActivity.this, "Selecione um metodo", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                int month;
-                if(auxSortType==2 || auxSortType==3) {
-                    try{
-                        month = Integer.parseInt(((EditText) v.findViewById(R.id.dss_edit_month)).getText().toString());
-                    }catch(Exception e){
-                        month = 100;
-                    }
-                    if(month<1 || month>12) {
-                        Toast.makeText(MainActivity.this, "Mes invalido", Toast.LENGTH_SHORT).show();
-                    }
-
-                    mes = month-1;
-                }
-                sortType = auxSortType;
-                monkeysFragment.updateList(sortType, mes);
-            }
-        });
-        alertDialog.show();
-    }*/
-
     class InsertTask extends AsyncTask<Compra, Void, Void> {
+        AppDatabase db;
         @Override
         protected Void doInBackground(Compra... compras) {
             try {
-                db.getDb().compraDao().insertAll(compras);
+                db = Room.databaseBuilder(MainActivity.this, AppDatabase.class, "monkey_db").build();
+                db.compraDao().insertAll(compras);
             }catch (Exception e){
                 Log.d("db", e.getMessage());
             }
@@ -217,20 +159,28 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            monkeysFragment.updateList(mes, ano);
-            monkeyDetailsFragment.updateList(mes, ano);
+            if(db!=null && db.isOpen()) db.close();
+            new UpdateAllTask().execute();
         }
     }
 
-    class GetCategoriesTask extends AsyncTask<View, Void, List<String>> {
-        View listItems;
+    class Aux2List{
+        public List<Compra> lc;
+        public List<MonkeyAverage> la;
 
+        public Aux2List(List<Compra> lc, List<MonkeyAverage> la) {
+            this.lc = lc;
+            this.la = la;
+        }
+    }
+    class UpdateAllTask extends AsyncTask<Void, Void, Aux2List> {
+        AppDatabase db;
         @Override
-        protected List<String> doInBackground(View... view) {
+        protected Aux2List doInBackground(Void... aVoid) {
             try {
-                listItems = view[0];
-                return db.getDb().compraDao().getAllCategories();
+                db = Room.databaseBuilder(MainActivity.this, AppDatabase.class, "monkey_db").build();
+                if (mes>-1 && mes<12) return new Aux2List(db.compraDao().getAll(mes, ano), db.monkeyAverageDAO().getSum(mes, ano));
+                return new Aux2List(db.compraDao().getAll(), db.monkeyAverageDAO().getSum());
             }catch (Exception e){
                 Log.d("db", e.getMessage());
             }
@@ -238,19 +188,22 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected void onPostExecute(List<String> list) {
-            for(String s : list){
-
-            }
+        protected void onPostExecute(Aux2List lists) {
+            monkeyDetailsFragment.updateList(lists.lc);
+            monkeysFragment.updateList(lists.la);
+            if(db!=null && db.isOpen()) db.close();
         }
     }
 
-    class ReadTestTask extends AsyncTask<Void, Void, List<Compra>> {
-
+    /*class UpdateDetailsTask extends AsyncTask<Void, Void, List<Compra>> {
+        AppDatabase db;
         @Override
-        protected List<Compra> doInBackground(Void... voids) {
+        protected List<Compra> doInBackground(Void... aVoid) {
             try {
-                //return db.getDb().userDao().getSum();
+                db = Room.databaseBuilder(MainActivity.this, AppDatabase.class, "monkey_db").build();
+                if (mes>-1 && mes<12)
+                    return db.compraDao().getAll(mes, ano);
+                return db.compraDao().getAll();
             }catch (Exception e){
                 Log.d("db", e.getMessage());
             }
@@ -259,8 +212,30 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(List<Compra> list) {
-            //for(Compra compra : list)
-            //    Log.d("db", "R$: "+compra.custo);
+            monkeyDetailsFragment.updateList(list);
+            if(db!=null && db.isOpen()) db.close();
         }
     }
+
+    class UpdateCategoriesTask extends AsyncTask<Void, Void, List<MonkeyAverage>> {
+        AppDatabase db;
+        @Override
+        protected List<MonkeyAverage> doInBackground(Void... aVoid) {
+            try {
+                db = Room.databaseBuilder(MainActivity.this, AppDatabase.class, "monkey_db").build();
+                if (mes>-1 && mes<12)
+                    return db.monkeyAverageDAO().getSum(mes, ano);
+                return db.monkeyAverageDAO().getSum();
+            }catch (Exception e){
+                Log.d("db", e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(List<MonkeyAverage> list) {
+            monkeysFragment.updateList(list);
+            if(db!=null && db.isOpen()) db.close();
+        }
+    }*/
 }

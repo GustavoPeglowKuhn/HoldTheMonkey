@@ -17,7 +17,8 @@
             android:text="Custo"
             android:textSize="25sp"
             android:textColor="#000"
-            android:gravity="center"/>
+            android:gravity="center"
+        />
 
         <TextView
             android:id="@+id/mlid_txt_categoria"

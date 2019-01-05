@@ -11,6 +11,8 @@ public class Compra {
     @PrimaryKey(autoGenerate = true)
     public int id;
 
+    /*if custo>0: e uma despesa
+    * if custo<0: e um lucro (tipo salario e outras entradas)*/
     @ColumnInfo(name = "custo")
     public float custo;
 

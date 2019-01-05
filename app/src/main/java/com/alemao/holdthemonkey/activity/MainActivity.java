@@ -1,12 +1,8 @@
 package com.alemao.holdthemonkey.activity;
 
-import android.app.Dialog;
 import android.arch.persistence.room.Room;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
-import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.content.ContextCompat;
@@ -20,21 +16,16 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.EditText;
-import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.alemao.holdthemonkey.R;
-import com.alemao.holdthemonkey.adapter.MonkeyDetailListItemAdapter;
 import com.alemao.holdthemonkey.database.AppDatabase;
 import com.alemao.holdthemonkey.database.Compra;
 import com.alemao.holdthemonkey.database.MonkeyAverage;
 import com.alemao.holdthemonkey.fragment.MonkeyListDetailsFragment;
 import com.alemao.holdthemonkey.fragment.MonkeyListFragment;
 import com.alemao.holdthemonkey.helper.SlidingTabLayout;
-import com.alemao.holdthemonkey.model.MonkeyListItem;
 
 import java.util.Calendar;
 import java.util.List;
@@ -87,7 +78,13 @@ public class MainActivity extends AppCompatActivity {
         mes = Calendar.getInstance().get(Calendar.MONTH);
         ano = Calendar.getInstance().get(Calendar.YEAR);
 
-        new UpdateAllTask().execute();
+        new UpdateListViewsTask().execute();
+
+        try {
+            monkeyDetailsFragment.configItemClick(MainActivity.this);
+        }catch(Exception e){
+            Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -99,20 +96,38 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Toast.makeText(MainActivity.this, R.string.version_name, Toast.LENGTH_SHORT).show();
-            return true;
+        switch(item.getItemId()){
+            case R.id.mm_item_calendar:
+                selectMounth();
+                return true;
+            case R.id.mm_item_version:
+                showVersion();
+                return true;
+            case R.id.mm_item_help:
+                showHelp();
+                return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
+    //Menu Items
+    private void selectMounth(){
+        //TODO: chamar um dialog para selecionar o mes
+        Toast.makeText(MainActivity.this, "colocarei na proxima versao", Toast.LENGTH_SHORT).show();
+    }
+
+    private void showVersion(){
+        //TODO: chamar um dialog com mais detalhes da versao e mais frescuras
+        Toast.makeText(MainActivity.this, R.string.version_name, Toast.LENGTH_SHORT).show();
+    }
+
+    private void showHelp(){
+        //TODO: chamar um dialog mostrando o texto de help
+        Toast.makeText(MainActivity.this, "colocarei na proxima versao", Toast.LENGTH_SHORT).show();
+    }
+    //!Menu Items!
+
+    //Database
     public void addMonkey(View view){
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
         LayoutInflater inflater = getLayoutInflater();
@@ -155,6 +170,66 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
+    public void updateItem(Compra compra){
+        new UpdateItemTask().execute(compra);
+    }
+
+    public void deleteItem(int id) {
+        new DeleteItemTask().execute(id);
+    }
+
+    class UpdateItemTask extends AsyncTask<Compra, Void, Void> {
+        AppDatabase db;
+        @Override
+        protected Void doInBackground(Compra... compras) {
+            if(compras==null || compras.length==0) return null;
+            try {
+                Compra c = compras[0];
+                db = Room.databaseBuilder(MainActivity.this, AppDatabase.class, "monkey_db").build();
+                db.compraDao().updateItem(c.id, c.custo, c.categoria, c.detalhes);
+            }catch (Exception e){
+                Log.d("db", e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            try{
+                if(db!=null && db.isOpen()) db.close();
+                new UpdateListViewsTask().execute();
+            }catch (Exception e){
+                Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    class DeleteItemTask extends AsyncTask<Integer, Void, Void> {
+        AppDatabase db;
+        @Override
+        protected Void doInBackground(Integer... ids) {
+            if(ids==null || ids.length==0) return null;
+            try {
+                int id = ids[0];
+                db = Room.databaseBuilder(MainActivity.this, AppDatabase.class, "monkey_db").build();
+                db.compraDao().deleteItem(id);
+            }catch (Exception e){
+                Log.d("db", e.getMessage());
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            try{
+                if(db!=null && db.isOpen()) db.close();
+                new UpdateListViewsTask().execute();
+            }catch (Exception e){
+                Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     class InsertTask extends AsyncTask<Compra, Void, Void> {
         AppDatabase db;
         @Override
@@ -172,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Void aVoid) {
             try{
                 if(db!=null && db.isOpen()) db.close();
-                new UpdateAllTask().execute();
+                new UpdateListViewsTask().execute();
             }catch (Exception e){
                 Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
@@ -188,14 +263,28 @@ public class MainActivity extends AppCompatActivity {
             this.la = la;
         }
     }
-    class UpdateAllTask extends AsyncTask<Void, Void, Aux2List> {
+    class UpdateListViewsTask extends AsyncTask<Void, Void, Aux2List> {
         AppDatabase db;
         @Override
         protected Aux2List doInBackground(Void... aVoid) {
             try {
                 db = Room.databaseBuilder(MainActivity.this, AppDatabase.class, "monkey_db").build();
-                if (mes>-1 && mes<12) return new Aux2List(db.compraDao().getAll(mes, ano), db.monkeyAverageDAO().getSum(mes, ano));
-                return new Aux2List(db.compraDao().getAll(), db.monkeyAverageDAO().getSum());
+                if (mes>-1 && mes<12){
+                    List<Compra> lc = db.compraDao().getAll(mes, ano);
+                    List<MonkeyAverage> la = db.monkeyAverageDAO().getSum(mes, ano);
+                    MonkeyAverage ma = new MonkeyAverage();
+                    ma.custo = db.monkeyAverageDAO().getTotalSum(mes, ano);
+                    ma.categoria = "Total";
+                    la.add(ma);
+                    return new Aux2List(lc, la);
+                }
+                List<Compra> lc = db.compraDao().getAll();
+                List<MonkeyAverage> la = db.monkeyAverageDAO().getSum();
+                MonkeyAverage ma = new MonkeyAverage();
+                ma.custo = db.monkeyAverageDAO().getTotalSum();
+                ma.categoria = "Total";
+                la.add(ma);
+                return new Aux2List(lc, la);
             }catch (Exception e){
                 Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
@@ -213,48 +302,5 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-    /*class UpdateDetailsTask extends AsyncTask<Void, Void, List<Compra>> {
-        AppDatabase db;
-        @Override
-        protected List<Compra> doInBackground(Void... aVoid) {
-            try {
-                db = Room.databaseBuilder(MainActivity.this, AppDatabase.class, "monkey_db").build();
-                if (mes>-1 && mes<12)
-                    return db.compraDao().getAll(mes, ano);
-                return db.compraDao().getAll();
-            }catch (Exception e){
-                Log.d("db", e.getMessage());
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(List<Compra> list) {
-            monkeyDetailsFragment.updateList(list);
-            if(db!=null && db.isOpen()) db.close();
-        }
-    }
-
-    class UpdateCategoriesTask extends AsyncTask<Void, Void, List<MonkeyAverage>> {
-        AppDatabase db;
-        @Override
-        protected List<MonkeyAverage> doInBackground(Void... aVoid) {
-            try {
-                db = Room.databaseBuilder(MainActivity.this, AppDatabase.class, "monkey_db").build();
-                if (mes>-1 && mes<12)
-                    return db.monkeyAverageDAO().getSum(mes, ano);
-                return db.monkeyAverageDAO().getSum();
-            }catch (Exception e){
-                Log.d("db", e.getMessage());
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(List<MonkeyAverage> list) {
-            monkeysFragment.updateList(list);
-            if(db!=null && db.isOpen()) db.close();
-        }
-    }*/
+    //!Database!
 }

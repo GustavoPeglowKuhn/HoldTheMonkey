@@ -18,4 +18,10 @@ public interface MonkeyAverageDAO {
 
     @Query("SELECT categoria, SUM(custo) AS custo FROM compra WHERE ano = :ano AND mes = :mes GROUP BY categoria")
     List<MonkeyAverage> getSum(int mes, int ano);
+
+    @Query("SELECT SUM(custo) FROM compra")
+    float getTotalSum();
+
+    @Query("SELECT SUM(custo) FROM compra WHERE ano = :ano AND mes = :mes")
+    float getTotalSum(int mes, int ano);
 }

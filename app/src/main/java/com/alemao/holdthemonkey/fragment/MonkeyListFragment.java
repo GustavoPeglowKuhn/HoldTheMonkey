@@ -39,12 +39,11 @@ public class MonkeyListFragment extends Fragment {
         adapter = new MonkeyListItemAdapter(getActivity(), monkeys);
         listView.setAdapter(adapter);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        /*listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
             }
-        });
+        });*/
 
         return view;
     }

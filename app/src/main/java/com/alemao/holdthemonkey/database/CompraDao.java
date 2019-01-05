@@ -17,6 +17,12 @@ public interface CompraDao {    //Data Access Object = DAO
     @Query("SELECT * FROM compra WHERE ano = :ano AND mes = :mes")
     List<Compra> getAll(int mes, int ano);
 
+    @Query("UPDATE compra SET custo = :custo, categoria = :categoria, detalhes = :detalhes WHERE id = :id")
+    void updateItem(int id, float custo, String categoria, String detalhes);
+
+    @Query("DELETE FROM compra WHERE id = :id")
+    void deleteItem(int id);
+
     @Insert
     void insertAll(Compra... users);
 

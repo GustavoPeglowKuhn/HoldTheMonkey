@@ -2,9 +2,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.alemao.holdthemonkey.MainActivity">
+
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/mm_item_calendar"
+        android:orderInCategory="10"
+        android:title="Month"
+        android:icon="@drawable/ic_calendar"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/mm_item_version"
         android:orderInCategory="100"
         android:title="Version"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/mm_item_help"
+        android:orderInCategory="200"
+        android:title="Help"
+        app:showAsAction="never"/>
 </menu>

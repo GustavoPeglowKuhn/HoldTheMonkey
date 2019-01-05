@@ -47,9 +47,16 @@ public class MonkeyDetailListItemAdapter extends ArrayAdapter<Compra> {
             else            mes = "/0"+(item.mes+1)+"/";
 
             txtCategoria.setText(item.categoria);
-            txtCusto.setText("R$"+item.custo);
             txtDetahles.setText(item.detalhes);
             txtData.setText(""+item.dia+mes+item.ano);
+
+            if(item.custo>0){
+                txtCusto.setText("R$"+item.custo);
+                txtCusto.setTextColor(context.getResources().getColor(R.color.gasto));
+            }else{
+                txtCusto.setText("R$"+(-item.custo));
+                txtCusto.setTextColor(context.getResources().getColor(R.color.ganho));
+            }
         }
 
         return view;

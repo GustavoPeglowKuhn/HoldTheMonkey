@@ -21,7 +21,7 @@
             android:id="@+id/dac_edit_custo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:digits="0123456789."
+            android:digits="-0123456789."
             android:gravity="bottom"
             android:inputType="number"
             android:minLines="1"

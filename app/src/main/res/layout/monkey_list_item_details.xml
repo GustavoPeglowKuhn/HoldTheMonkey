@@ -28,12 +28,14 @@
             android:gravity="center"
             android:textSize="20sp"/>
     </LinearLayout>
+
     <TextView
         android:id="@+id/mlid_txt_detalhes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:maxLines="2"
         android:text="detahles da compra"
-        android:textSize="15sp"/>
+        android:textSize="15sp" />
     <TextView
         android:id="@+id/mlid_txt_data"
         android:layout_width="match_parent"

@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.alemao.holdthemonkey.R;
@@ -38,12 +39,12 @@ public class MonkeyListFragment extends Fragment {
         adapter = new MonkeyListItemAdapter(getActivity(), monkeys);
         listView.setAdapter(adapter);
 
-        /*listView.setOnClickListener(new AdapterView.OnItemClickListener(){
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
             }
-        });*/
+        });
 
         return view;
     }

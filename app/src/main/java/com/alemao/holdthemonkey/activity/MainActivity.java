@@ -130,12 +130,23 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 EditText txtCusto = v.findViewById(R.id.dac_edit_custo);
-                EditText txtcategoria = v.findViewById(R.id.dac_edit_categoria);
+                EditText txtCategoria = v.findViewById(R.id.dac_edit_categoria);
+                EditText txtDetahles = v.findViewById(R.id.dac_edit_detahles);
+
+                if(txtCusto.getText().length() == 0){
+                    Toast.makeText(MainActivity.this, "Digite o custo!", Toast.LENGTH_SHORT).show();;
+                    return;
+                }
+                if(txtCategoria.getText().length() == 0){
+                    Toast.makeText(MainActivity.this, "Digite a categoria!", Toast.LENGTH_SHORT).show();;
+                    return;
+                }
 
                 float custo = Float.parseFloat(txtCusto.getText().toString());
-                String categoria = txtcategoria.getText().toString();
+                String categoria = txtCategoria.getText().toString();
+                String detalhes = txtDetahles.getText().toString();
 
-                Compra c = new Compra(categoria, custo, "");
+                Compra c = new Compra(categoria, custo, detalhes);
 
                 new InsertTask().execute(c);
             }
@@ -159,8 +170,12 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if(db!=null && db.isOpen()) db.close();
-            new UpdateAllTask().execute();
+            try{
+                if(db!=null && db.isOpen()) db.close();
+                new UpdateAllTask().execute();
+            }catch (Exception e){
+                Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -182,16 +197,20 @@ public class MainActivity extends AppCompatActivity {
                 if (mes>-1 && mes<12) return new Aux2List(db.compraDao().getAll(mes, ano), db.monkeyAverageDAO().getSum(mes, ano));
                 return new Aux2List(db.compraDao().getAll(), db.monkeyAverageDAO().getSum());
             }catch (Exception e){
-                Log.d("db", e.getMessage());
+                Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
             }
             return null;
         }
 
         @Override
         protected void onPostExecute(Aux2List lists) {
-            monkeyDetailsFragment.updateList(lists.lc);
-            monkeysFragment.updateList(lists.la);
-            if(db!=null && db.isOpen()) db.close();
+            try {
+                monkeyDetailsFragment.updateList(lists.lc);
+                monkeysFragment.updateList(lists.la);
+                if(db!=null && db.isOpen()) db.close();
+            }catch (Exception e){
+                Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
         }
     }
 

@@ -11,11 +11,11 @@ public class Compra {
     @PrimaryKey(autoGenerate = true)
     public int id;
 
+    @ColumnInfo(name = "custo")
+    public float custo;
+
     @ColumnInfo(name = "categoria")
     public String categoria;
-
-    @ColumnInfo(name = "custo")
-    public float  custo;
 
     @ColumnInfo(name = "detalhes")
     public String detalhes;

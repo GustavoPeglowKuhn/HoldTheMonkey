@@ -16,11 +16,39 @@
             android:layout_height="wrap_content"
             android:text="Custo: "
             android:gravity="top"/>
+
         <EditText
             android:id="@+id/dac_edit_custo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="bottom"/>
+            android:digits="0123456789."
+            android:gravity="bottom"
+            android:inputType="number"
+            android:minLines="1"
+            android:maxLines="1" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="10dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Categoria: "
+            android:gravity="top"/>
+
+        <EditText
+            android:id="@+id/dac_edit_categoria"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:inputType="text"
+            android:minLines="1"
+            android:maxLines="1"/>
     </LinearLayout>
 
     <LinearLayout
@@ -34,12 +62,15 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Categoria: "
+            android:text="Detalhes: "
             android:gravity="top"/>
+
         <EditText
-            android:id="@+id/dac_edit_categoria"
+            android:id="@+id/dac_edit_detahles"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:inputType="text"
+            android:minLines="1"/>
     </LinearLayout>
 </LinearLayout>

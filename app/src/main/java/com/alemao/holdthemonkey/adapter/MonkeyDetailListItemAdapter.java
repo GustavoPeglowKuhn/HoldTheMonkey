@@ -50,13 +50,19 @@ public class MonkeyDetailListItemAdapter extends ArrayAdapter<Compra> {
             txtDetahles.setText(item.detalhes);
             txtData.setText(""+item.dia+mes+item.ano);
 
+            String custo;
+
             if(item.custo>0){
-                txtCusto.setText("R$"+item.custo);
+                custo = "R$ "+item.custo;
                 txtCusto.setTextColor(context.getResources().getColor(R.color.gasto));
             }else{
-                txtCusto.setText("R$"+(-item.custo));
+                custo = "R$ "+(-item.custo);
                 txtCusto.setTextColor(context.getResources().getColor(R.color.ganho));
             }
+
+            if(custo.lastIndexOf(".") == (custo.length()-2))
+                custo+="0";
+            txtCusto.setText(custo);
         }
 
         return view;

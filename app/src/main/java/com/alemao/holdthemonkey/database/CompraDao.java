@@ -14,6 +14,8 @@ public interface CompraDao {    //Data Access Object = DAO
 
     @Query("SELECT * FROM compra")
     List<Compra> getAll();
+    @Query("SELECT * FROM compra WHERE ano = :ano")
+    List<Compra> getAll(int ano);
     @Query("SELECT * FROM compra WHERE ano = :ano AND mes = :mes")
     List<Compra> getAll(int mes, int ano);
 

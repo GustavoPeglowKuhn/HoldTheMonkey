@@ -16,7 +16,11 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.NumberPicker;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.alemao.holdthemonkey.R;
@@ -39,8 +43,8 @@ public class MainActivity extends AppCompatActivity {
     MonkeyListFragment monkeysFragment;
     MonkeyListDetailsFragment monkeyDetailsFragment;
 
-    static int mes;     //de 0 a 11
-    static int ano;
+    static int mes;     //de 0 a 11         (-1 nao depende do mes)
+    static int ano;     //                  (-1 nao depende do ano)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.mm_item_calendar:
-                selectMounth();
+                selectMonth();
                 return true;
             case R.id.mm_item_version:
                 showVersion();
@@ -111,9 +115,77 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Menu Items
-    private void selectMounth(){
-        //TODO: chamar um dialog para selecionar o mes
-        Toast.makeText(MainActivity.this, "colocarei na proxima versao", Toast.LENGTH_SHORT).show();
+    private void selectMonth(){
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+        LayoutInflater inflater = getLayoutInflater();
+
+        final View v = inflater.inflate(R.layout.dialog_month_selector, null);
+        final NumberPicker npMonth = v.findViewById(R.id.dms_np_month);
+        final NumberPicker npYear  = v.findViewById(R.id.dms_np_year);
+        final RadioGroup rg = v.findViewById(R.id.dms_rg);
+        final RadioButton rb0 = v.findViewById(R.id.dms_rb0);
+        final RadioButton rb1 = v.findViewById(R.id.dms_rb1);
+        final RadioButton rb2 = v.findViewById(R.id.dms_rb2);
+
+        int curMonth = Calendar.getInstance().get(Calendar.MONTH)+1;
+        int curYear  = Calendar.getInstance().get(Calendar.YEAR);
+
+        npMonth.setMinValue(1);
+        npMonth.setMaxValue(12);
+        npMonth.setValue(curMonth);
+
+        npYear.setMinValue(2018);
+        npYear.setMaxValue(curYear+10);
+        npYear.setValue(curYear);
+
+        npMonth.setEnabled(false);
+        npYear.setEnabled(false);
+
+        rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if(rb0.isChecked()){
+                    npMonth.setEnabled(false);
+                    npYear.setEnabled(false);
+                }else if(rb1.isChecked()){
+                    npMonth.setEnabled(false);
+                    npYear.setEnabled(true);
+                }else{
+                    npMonth.setEnabled(true);
+                    npYear.setEnabled(true);
+                }
+            }
+        });
+
+        alertDialog.setView(v);
+
+        alertDialog.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if(rb0.isChecked()){
+                    mes = -1;
+                    ano = -1;
+                }else if(rb1.isChecked()){
+                    mes = -1;
+                    ano = npYear.getValue();
+                }else if(rb2.isChecked()){
+                    mes = npMonth.getValue()-1;
+                    ano = npYear.getValue();
+                }else{
+                    Toast.makeText(MainActivity.this, "Selecione o periodo!", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                new UpdateListViewsTask().execute();    //atualiza as listViews
+            }
+        });
+
+        alertDialog.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
+
+        alertDialog.show();
     }
 
     private void showVersion(){
@@ -269,11 +341,20 @@ public class MainActivity extends AppCompatActivity {
         protected Aux2List doInBackground(Void... aVoid) {
             try {
                 db = Room.databaseBuilder(MainActivity.this, AppDatabase.class, "monkey_db").build();
-                if (mes>-1 && mes<12){
-                    List<Compra> lc = db.compraDao().getAll(mes, ano);
-                    List<MonkeyAverage> la = db.monkeyAverageDAO().getSum(mes, ano);
+                if(ano>-1){
+                    if(mes>-1 && mes<12){
+                        List<Compra> lc = db.compraDao().getAll(mes, ano);
+                        List<MonkeyAverage> la = db.monkeyAverageDAO().getSum(mes, ano);
+                        MonkeyAverage ma = new MonkeyAverage();
+                        ma.custo = db.monkeyAverageDAO().getTotalSum(mes, ano);
+                        ma.categoria = "Total";
+                        la.add(ma);
+                        return new Aux2List(lc, la);
+                    }
+                    List<Compra> lc = db.compraDao().getAll(ano);
+                    List<MonkeyAverage> la = db.monkeyAverageDAO().getSum(ano);
                     MonkeyAverage ma = new MonkeyAverage();
-                    ma.custo = db.monkeyAverageDAO().getTotalSum(mes, ano);
+                    ma.custo = db.monkeyAverageDAO().getTotalSum(ano);
                     ma.categoria = "Total";
                     la.add(ma);
                     return new Aux2List(lc, la);

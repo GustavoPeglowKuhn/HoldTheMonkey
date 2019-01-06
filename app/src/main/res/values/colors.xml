@@ -6,6 +6,8 @@
 
     <color name="myGreen">#2BA014</color>
 
+    <color name="black">#000</color>
+
     <color name="ganho">#3d7201</color>
     <color name="gasto">#9e0101</color>
 </resources>

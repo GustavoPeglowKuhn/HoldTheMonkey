@@ -45,16 +45,22 @@ public class MonkeyListItemAdapter extends ArrayAdapter<MonkeyListItem> {
 
             String custo;
 
-            if(item.getCusto()>0){
+            if(item.getCusto()<0){
+                custo = "R$ "+(-item.getCusto());
+                txtCusto.setTextColor(context.getResources().getColor(R.color.ganho));
+            }else if(item.getCusto()>0){
                 custo = "R$ "+item.getCusto();
                 txtCusto.setTextColor(context.getResources().getColor(R.color.gasto));
             }else{
-                custo = "R$ "+(-item.getCusto());
-                txtCusto.setTextColor(context.getResources().getColor(R.color.ganho));
+                custo = "R$ "+item.getCusto();
+                txtCusto.setTextColor(context.getResources().getColor(R.color.black));
             }
 
-            if(custo.lastIndexOf(".") == (custo.length()-2))
+            int pontoPos = custo.lastIndexOf(".");
+            if(pontoPos == (custo.length()-2))
                 custo+="0";
+            else if(pontoPos < (custo.length()-3))
+                custo = custo.substring(0, pontoPos+3);
             txtCusto.setText(custo);
         }
 

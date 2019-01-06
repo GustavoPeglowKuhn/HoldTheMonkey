@@ -1,6 +1,7 @@
 package com.alemao.holdthemonkey.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -52,16 +53,22 @@ public class MonkeyDetailListItemAdapter extends ArrayAdapter<Compra> {
 
             String custo;
 
-            if(item.custo>0){
+            if(item.custo<0){
+                custo = "R$ "+(-item.custo);
+                txtCusto.setTextColor(context.getResources().getColor(R.color.ganho));
+            }else if(item.custo>0){
                 custo = "R$ "+item.custo;
                 txtCusto.setTextColor(context.getResources().getColor(R.color.gasto));
             }else{
-                custo = "R$ "+(-item.custo);
-                txtCusto.setTextColor(context.getResources().getColor(R.color.ganho));
+                custo = "R$ "+item.custo;
+                txtCusto.setTextColor(context.getResources().getColor(R.color.black));
             }
 
-            if(custo.lastIndexOf(".") == (custo.length()-2))
+            int pontoPos = custo.lastIndexOf(".");
+            if(pontoPos == (custo.length()-2))
                 custo+="0";
+            else if(pontoPos < (custo.length()-3))
+                custo = custo.substring(0, pontoPos+3);
             txtCusto.setText(custo);
         }
 

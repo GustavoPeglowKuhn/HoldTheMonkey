@@ -4,10 +4,16 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#3d958a</color>
 
+
     <color name="myGreen">#2BA014</color>
 
     <color name="black">#000</color>
 
     <color name="ganho">#3d7201</color>
     <color name="gasto">#9e0101</color>
+
+    <color name="dataFutura">#06bc00</color>
+
+    <color name="link">#1f81d6</color>
+    <color name="linkDisable">#80a1bc</color>
 </resources>

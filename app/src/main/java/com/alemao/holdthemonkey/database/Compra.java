@@ -30,14 +30,5 @@ public class Compra {
     @ColumnInfo(name = "ano")
     public int  ano;
 
-    public Compra(String categoria, float custo, String detalhes) {
-        this.categoria = categoria;
-        this.custo = custo;
-        this.detalhes = detalhes;
-
-        Calendar calendar = Calendar.getInstance();
-        dia = calendar.get(Calendar.DAY_OF_MONTH);
-        mes = calendar.get(Calendar.MONTH);
-        ano = calendar.get(Calendar.YEAR);
-    }
+    public Compra(){}
 }

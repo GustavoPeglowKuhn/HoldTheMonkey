@@ -73,4 +73,32 @@
             android:inputType="text"
             android:minLines="1"/>
     </LinearLayout>
+
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="20dp">
+        <RadioButton
+            android:id="@+id/dac_rb_today"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="hoje"
+            android:checked="true"/>
+        <RadioButton
+            android:id="@+id/dac_rb_custom_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Outro dia:"
+            android:paddingRight="20dp"
+            android:checked="false"/>
+    </RadioGroup>
+    <TextView
+        android:id="@+id/dac_txt_custom_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="04/02/2019"
+        android:textSize="16sp"
+        android:paddingLeft="40dp"
+        android:textColor="@color/linkDisable"
+        android:enabled="false"/>
 </LinearLayout>

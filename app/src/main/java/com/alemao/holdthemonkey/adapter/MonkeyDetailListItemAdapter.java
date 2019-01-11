@@ -10,8 +10,10 @@ import android.widget.TextView;
 
 import com.alemao.holdthemonkey.R;
 import com.alemao.holdthemonkey.database.Compra;
+import com.alemao.holdthemonkey.helper.DateHelper;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class MonkeyDetailListItemAdapter extends ArrayAdapter<Compra> {
 
@@ -50,6 +52,7 @@ public class MonkeyDetailListItemAdapter extends ArrayAdapter<Compra> {
             txtCategoria.setText(item.categoria);
             txtDetahles.setText(item.detalhes);
             txtData.setText(""+item.dia+mes+item.ano);
+            //txtData.setText(context.getString(R.string.date_formater, item.dia, item.mes+1, item.ano));
 
             String custo;
 
@@ -70,6 +73,10 @@ public class MonkeyDetailListItemAdapter extends ArrayAdapter<Compra> {
             else if(pontoPos < (custo.length()-3))
                 custo = custo.substring(0, pontoPos+3);
             txtCusto.setText(custo);
+
+            if(DateHelper.isInFuture(item.dia, item.mes, item.ano)){
+                txtData.setTextColor(context.getResources().getColor(R.color.dataFutura));
+            }
         }
 
         return view;

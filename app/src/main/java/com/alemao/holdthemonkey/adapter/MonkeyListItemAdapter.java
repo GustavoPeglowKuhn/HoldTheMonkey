@@ -21,8 +21,6 @@ public class MonkeyListItemAdapter extends ArrayAdapter<MonkeyListItem> {
         super(c, 0, objects);
         this.list = objects;
         this.context = c;
-
-
     }
 
     @Override

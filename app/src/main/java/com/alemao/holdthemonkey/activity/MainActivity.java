@@ -1,5 +1,6 @@
 package com.alemao.holdthemonkey.activity;
 
+import android.app.DatePickerDialog;
 import android.arch.persistence.room.Room;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
@@ -17,10 +18,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alemao.holdthemonkey.R;
@@ -43,14 +46,19 @@ public class MainActivity extends AppCompatActivity {
     MonkeyListFragment monkeysFragment;
     MonkeyListDetailsFragment monkeyDetailsFragment;
 
+    static int dia;
     static int mes;     //de 0 a 11         (-1 nao depende do mes)
     static int ano;     //                  (-1 nao depende do ano)
+
+    int _dia, _mes, _ano;   //retorno do metodo getDate()
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
+
+        Toolbar toolbar = findViewById(R.id.am_toolbar);
+        toolbar.setTitle("Hold The Monkey");
         setSupportActionBar(toolbar);
 
         slidingTabLayout = findViewById(R.id.main_stl);
@@ -79,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(tabAdapter);
         slidingTabLayout.setViewPager(viewPager);
 
+        dia = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
         mes = Calendar.getInstance().get(Calendar.MONTH);
         ano = Calendar.getInstance().get(Calendar.YEAR);
 
@@ -115,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Menu Items
+        //filtro de pesquisa
     private void selectMonth(){
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
         LayoutInflater inflater = getLayoutInflater();
@@ -206,12 +216,44 @@ public class MainActivity extends AppCompatActivity {
 
         final View v = inflater.inflate(R.layout.dialog_add_compra, null);
 
-        alertDialog.setView(v);
+        final RadioButton rbCustomDate = v.findViewById(R.id.dac_rb_custom_date);
+        final TextView txtCustomDate = v.findViewById(R.id.dac_txt_custom_date);
 
-        alertDialog.setNegativeButton("cancel", new DialogInterface.OnClickListener(){
+        Calendar calendar = Calendar.getInstance();
+        _dia = calendar.get(Calendar.DAY_OF_MONTH);
+        _mes = calendar.get(Calendar.MONTH);
+        _ano = calendar.get(Calendar.YEAR);
+        txtCustomDate.setText(getString(R.string.date_formater, _dia, _mes+1, _ano));
+
+        rbCustomDate.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) { }
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(rbCustomDate.isChecked()){
+                    txtCustomDate.setEnabled(true);
+                    txtCustomDate.setTextColor(getResources().getColor(R.color.link));
+                }else{
+                    txtCustomDate.setEnabled(false);
+                    txtCustomDate.setTextColor(getResources().getColor(R.color.linkDisable));
+                }
+            }
         });
+        txtCustomDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                com.alemao.holdthemonkey.dialog.DatePickerDialog datePickerDialog = new com.alemao.holdthemonkey.dialog.DatePickerDialog(MainActivity.this, getLayoutInflater()) {
+                    @Override
+                    public void OnDataSet() {
+                        _dia = getDia();
+                        _mes = getMes();
+                        _ano = getAno();
+
+                        txtCustomDate.setText(getString(R.string.date_formater, _dia, _mes+1, _ano));
+                    }
+                };
+            }
+        });
+
+        alertDialog.setView(v);
 
         alertDialog.setPositiveButton("Add", new DialogInterface.OnClickListener() {
             @Override
@@ -233,10 +275,28 @@ public class MainActivity extends AppCompatActivity {
                 String categoria = txtCategoria.getText().toString();
                 String detalhes = txtDetahles.getText().toString();
 
-                Compra c = new Compra(categoria, custo, detalhes);
+                Compra c = new Compra();
+                c.categoria = categoria;
+                c.custo = custo;
+                c.detalhes = detalhes;
+                if(rbCustomDate.isChecked()){
+                    c.dia = _dia;
+                    c.mes = _mes;
+                    c.ano = _ano;
+                }else{
+                    Calendar calendar = Calendar.getInstance();
+                    c.dia = calendar.get(Calendar.DAY_OF_MONTH);
+                    c.mes = calendar.get(Calendar.MONTH);
+                    c.ano = calendar.get(Calendar.YEAR);
+                }
 
                 new InsertTask().execute(c);
             }
+        });
+
+        alertDialog.setNegativeButton("cancel", new DialogInterface.OnClickListener(){
+            @Override
+            public void onClick(DialogInterface dialog, int which) { }
         });
 
         alertDialog.show();
@@ -258,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 Compra c = compras[0];
                 db = Room.databaseBuilder(MainActivity.this, AppDatabase.class, "monkey_db").build();
-                db.compraDao().updateItem(c.id, c.custo, c.categoria, c.detalhes);
+                db.compraDao().updateItem(c.id, c.custo, c.categoria, c.detalhes, c.dia, c.mes, c.ano);
             }catch (Exception e){
                 Log.d("db", e.getMessage());
             }

@@ -2,6 +2,19 @@
     <string name="app_name">Hold The Monkey</string>
     <string name="action_settings">Settings</string>
 
-    <string name="version_name">V1.2.4</string>
+    <string name="version_name">V1.2.5</string>
     <string name="date_formater">%1$d/%2$d/%3$d</string>
+
+    <string name="lbl_jan">Janeiro</string>
+    <string name="lbl_feb">Fevereiro</string>
+    <string name="lbl_mar">Março</string>
+    <string name="lbl_apr">Abril</string>
+    <string name="lbl_may">Maio</string>
+    <string name="lbl_jun">Junho</string>
+    <string name="lbl_jul">Julho</string>
+    <string name="lbl_aug">Agosto</string>
+    <string name="lbl_sep">Setembro</string>
+    <string name="lbl_oct">Outubro</string>
+    <string name="lbl_nov">Novembro</string>
+    <string name="lbl_dec">Dezembro</string>
 </resources>

@@ -1,5 +1,9 @@
 package com.alemao.holdthemonkey.helper;
 
+import android.content.Context;
+
+import com.alemao.holdthemonkey.R;
+
 import java.util.Calendar;
 
 public class DateHelper {
@@ -26,5 +30,23 @@ public class DateHelper {
         int _ano = calendar.get(Calendar.YEAR);
 
         return _dia==dia && _mes==mes && _ano==ano;
+    }
+    
+    static public String getMonth(Context context, int month){
+        switch (month){
+            case  0: return context.getString(R.string.lbl_jan);
+            case  1: return context.getString(R.string.lbl_feb);
+            case  2: return context.getString(R.string.lbl_mar);
+            case  3: return context.getString(R.string.lbl_may);
+            case  4: return context.getString(R.string.lbl_apr);
+            case  5: return context.getString(R.string.lbl_jun);
+            case  6: return context.getString(R.string.lbl_jul);
+            case  7: return context.getString(R.string.lbl_aug);
+            case  8: return context.getString(R.string.lbl_sep);
+            case  9: return context.getString(R.string.lbl_oct);
+            case 10: return context.getString(R.string.lbl_nov);
+            case 11: return context.getString(R.string.lbl_dec);
+        }
+        return null;
     }
 }

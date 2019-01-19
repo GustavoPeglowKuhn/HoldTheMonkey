@@ -32,6 +32,7 @@ import com.alemao.holdthemonkey.database.Compra;
 import com.alemao.holdthemonkey.database.MonkeyAverage;
 import com.alemao.holdthemonkey.fragment.MonkeyListDetailsFragment;
 import com.alemao.holdthemonkey.fragment.MonkeyListFragment;
+import com.alemao.holdthemonkey.helper.DateHelper;
 import com.alemao.holdthemonkey.helper.SlidingTabLayout;
 
 import java.util.Calendar;
@@ -40,6 +41,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private SlidingTabLayout slidingTabLayout;
     private ViewPager viewPager;
+    private Toolbar toolbar;
 
     //tab titles names
     String[] tabsTitles = {"TOODS", "POR CATEGORIA"};
@@ -57,8 +59,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = findViewById(R.id.am_toolbar);
-        toolbar.setTitle("Hold The Monkey");
+        toolbar = findViewById(R.id.am_toolbar);
         setSupportActionBar(toolbar);
 
         slidingTabLayout = findViewById(R.id.main_stl);
@@ -87,17 +88,23 @@ public class MainActivity extends AppCompatActivity {
         viewPager.setAdapter(tabAdapter);
         slidingTabLayout.setViewPager(viewPager);
 
-        dia = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
-        mes = Calendar.getInstance().get(Calendar.MONTH);
-        ano = Calendar.getInstance().get(Calendar.YEAR);
+        Calendar c = Calendar.getInstance();
+        dia = c.get(Calendar.DAY_OF_MONTH);
+        mes = c.get(Calendar.MONTH);
+        ano = c.get(Calendar.YEAR);
 
         new UpdateListViewsTask().execute();
+    }
 
+    @Override
+    protected void onResume() {
         try {
             monkeyDetailsFragment.configItemClick(MainActivity.this);
         }catch(Exception e){
             Toast.makeText(MainActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
+        toolbar.setTitle(DateHelper.getMonth(MainActivity.this, mes)+" "+ano);
+        super.onResume();
     }
 
     @Override
@@ -175,12 +182,15 @@ public class MainActivity extends AppCompatActivity {
                 if(rb0.isChecked()){
                     mes = -1;
                     ano = -1;
+                    toolbar.setTitle("Todos os tempos");
                 }else if(rb1.isChecked()){
                     mes = -1;
                     ano = npYear.getValue();
+                    toolbar.setTitle(""+ano);
                 }else if(rb2.isChecked()){
                     mes = npMonth.getValue()-1;
                     ano = npYear.getValue();
+                    toolbar.setTitle(DateHelper.getMonth(MainActivity.this, mes)+" "+ano);
                 }else{
                     Toast.makeText(MainActivity.this, "Selecione o periodo!", Toast.LENGTH_SHORT).show();
                     return;

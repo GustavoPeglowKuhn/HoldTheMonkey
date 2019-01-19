@@ -25,6 +25,8 @@ abstract public class DatePickerDialog {
         final View v = inf.inflate(R.layout.dialog_date_picker, null);
         final DatePicker datePicker = v.findViewById(R.id.datePicker);
 
+        //datePicker.updateDate(2019, 01, 01);  //receber a data inicial no construtor
+
         //int curDay   = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
         //int curMonth = Calendar.getInstance().get(Calendar.MONTH)+1;
         //int curYear  = Calendar.getInstance().get(Calendar.YEAR);
